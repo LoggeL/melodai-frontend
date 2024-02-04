@@ -5,19 +5,40 @@ import LyricLine from './components/LyricLine'
 
 // Load song.json
 import song from './song.json'
+import { useState } from 'react'
 
 const durationFormatted = (duration: number) => {
+  duration = Math.round(duration)
   const minutes = Math.floor(duration / 60)
   const seconds = duration - minutes * 60
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
-const currentTime = 181
-const volume = 0.5
+let currentTime = 181
+let volume = 0.5
+// let highlightedWord = { lineIndex: 10, wordIndex: 3 }
 
 export default function Home() {
+  const [highlightedWord, setHighlightedWord] = useState<{
+    lineIndex: number
+    wordIndex: number
+  } | null>({ lineIndex: 10, wordIndex: 3 })
+
+  const wordOnClick = (word: { lineIndex: number; wordIndex: number }) => {
+    console.log('Clicked on word:', word)
+
+    setHighlightedWord(word)
+
+    // Find timing of word
+    const wordTiming =
+      song.expand.lyrics.lyrics[word.lineIndex].words[word.wordIndex].start
+
+    // Seek to timing
+    currentTime = wordTiming
+  }
+
   return (
-    <main className='flex min-h-screen flex-col items-center justify-between sm:px-0 md:p-24 bg-green-50'>
+    <main className='flex min-h-screen flex-col items-center justify-between sm:px-0 bg-green-50'>
       <div className='fixed top-0 left-0 z-50 grid h-24 sm:px-0 md:px-8 w-full text-center'>
         <div className='flex items-center justify-between mx-auto bg-white rounded-b-lg'>
           <div className='flex items-center justify-start me-auto mx-8 w-44'>
@@ -127,7 +148,7 @@ export default function Home() {
                 </span>
                 <div className='w-full bg-gray-200 rounded-full h-1.5'>
                   <div
-                    className='bg-blue-600 h-1.5 rounded-full'
+                    className='bg-blue-600 h-1.5 rounded-full transition-all'
                     style={{ width: (currentTime / song.duration) * 100 + '%' }}
                   ></div>
                 </div>
@@ -165,7 +186,7 @@ export default function Home() {
             </div>
             <div className='mx-auto w-16 bg-gray-200 rounded-full h-1.5'>
               <div
-                className='bg-blue-600 h-1.5 rounded-full'
+                className='bg-blue-600 h-1.5 rounded-full transition-all'
                 style={{ width: volume * 100 + '%' }}
               ></div>
             </div>
@@ -173,10 +194,16 @@ export default function Home() {
         </div>
       </div>
 
-      <section className='mt-96 mb-96'>
+      <section style={{ margin: '50vh 0' }}>
         <div className='flex items-center justify-center w-full flex-col'>
           {song.expand.lyrics.lyrics.map((line, index) => (
-            <LyricLine text={line.text} index={index} key={index} />
+            <LyricLine
+              line={line.words.map((e) => e.word)}
+              lineIndex={index}
+              key={index}
+              highlightedWord={highlightedWord}
+              onWordClick={wordOnClick}
+            />
           ))}
         </div>
       </section>

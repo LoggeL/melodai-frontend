@@ -1,31 +1,43 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
+import LyricWord from './LyricWord'
 
-const LyricLine = ({ text, index }: { text: string; index: number }) => {
-  const pRef = useRef<HTMLParagraphElement | null>(null)
+interface LyricLineProps {
+  line: string[]
+  lineIndex: number
+  highlightedWord: { lineIndex: number; wordIndex: number } | null
+  onWordClick: (word: { lineIndex: number; wordIndex: number }) => void
+}
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (pRef.current) {
-        const rect = pRef.current.getBoundingClientRect()
-        const centerScreen = window.innerHeight / 2
-        const distanceFromCenter = Math.abs(centerScreen - rect.top)
-        const opacity = Math.max(1 - distanceFromCenter / centerScreen, 0)
-        pRef.current.style.opacity = opacity.toString()
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
+const LyricLine: React.FC<LyricLineProps> = ({
+  line,
+  lineIndex,
+  highlightedWord,
+  onWordClick,
+}) => {
   return (
-    <p
-      ref={pRef}
-      key={index}
-      className='text-2xl text-center text-gray-900 my-4'
+    <div
+      className='my-4 text-md md:text-2xl transition-all break-words w-max-full'
+      style={{
+        opacity: highlightedWord
+          ? Math.max(
+              0.1,
+              1 - Math.abs(lineIndex - highlightedWord?.lineIndex) * 0.1
+            )
+          : 0,
+      }}
     >
-      {text}
-    </p>
+      {line.map((word, wordIndex) => (
+        <LyricWord
+          key={wordIndex}
+          word={word}
+          isHighlighted={
+            highlightedWord?.lineIndex === lineIndex &&
+            highlightedWord?.wordIndex === wordIndex
+          }
+          onClick={() => onWordClick({ lineIndex, wordIndex })}
+        />
+      ))}
+    </div>
   )
 }
 

@@ -2,10 +2,11 @@
 
 import Image from 'next/image'
 import LyricLine from './components/LyricLine'
+import { usePalette } from 'color-thief-react'
 
 // Load song.json
 import song from './song.json'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const durationFormatted = (duration: number) => {
   duration = Math.round(duration)
@@ -14,9 +15,7 @@ const durationFormatted = (duration: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
-let currentTime = 181
 let volume = 0.5
-// let highlightedWord = { lineIndex: 10, wordIndex: 3 }
 
 export default function Home() {
   const [highlightedWord, setHighlightedWord] = useState<{
@@ -24,6 +23,49 @@ export default function Home() {
     wordIndex: number
   } | null>({ lineIndex: 10, wordIndex: 3 })
 
+  const [albumColors, setAlbumColors] = useState<string[]>([
+    '#ffffff',
+    '#000000',
+  ])
+
+  const [currentTime, setCurrentTime] = useState(0)
+
+  // Seek song handler
+  const seekSong = (event: MouseEvent) => {
+    console.log(event)
+    if (!event.target || !(event.target instanceof HTMLElement)) return
+    const rect = event.target.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const width = rect.right - rect.left
+    const time = (x / width) * song.duration
+    console.log('Seeking to:', time)
+    setCurrentTime(time)
+
+    // Try to find current word
+    for (let i = 0; i < song.expand.lyrics.lyrics.length; i++) {
+      const line = song.expand.lyrics.lyrics[i]
+      for (let j = 0; j < line.words.length; j++) {
+        const word = line.words[j]
+        if (word.start > time) {
+          console.log('Found word:', word.word)
+          setHighlightedWord({ lineIndex: i, wordIndex: j })
+          return
+        }
+      }
+    }
+  }
+
+  // Color Management
+  const { data, loading, error } = usePalette('/thumbnail.jpg', 2, 'hex')
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setAlbumColors(data)
+      console.log('Album colors:', data)
+    }
+  }, [data])
+
+  // Word click handler
   const wordOnClick = (word: { lineIndex: number; wordIndex: number }) => {
     console.log('Clicked on word:', word)
 
@@ -34,11 +76,14 @@ export default function Home() {
       song.expand.lyrics.lyrics[word.lineIndex].words[word.wordIndex].start
 
     // Seek to timing
-    currentTime = wordTiming
+    setCurrentTime(wordTiming)
   }
 
   return (
-    <main className='flex min-h-screen flex-col items-center justify-between sm:px-0 bg-green-50'>
+    <main
+      className='transition-all flex min-h-screen flex-col items-center justify-between sm:px-0'
+      style={{ backgroundColor: albumColors[0] }}
+    >
       <div className='fixed top-0 left-0 z-50 grid h-24 sm:px-0 md:px-8 w-full text-center'>
         <div className='flex items-center justify-between mx-auto bg-white rounded-b-lg'>
           <div className='flex items-center justify-start me-auto mx-8 w-44'>
@@ -146,7 +191,10 @@ export default function Home() {
                 <span className='text-sm font-medium text-gray-900'>
                   {durationFormatted(currentTime)}
                 </span>
-                <div className='w-full bg-gray-200 rounded-full h-1.5'>
+                <div
+                  className='w-full bg-gray-200 rounded-full h-1.5 cursor-pointer'
+                  onClick={(e) => seekSong(e)}
+                >
                   <div
                     className='bg-blue-600 h-1.5 rounded-full transition-all'
                     style={{ width: (currentTime / song.duration) * 100 + '%' }}
@@ -195,7 +243,13 @@ export default function Home() {
       </div>
 
       <section style={{ margin: '50vh 0' }}>
-        <div className='flex items-center justify-center w-full flex-col'>
+        <div
+          className='flex items-center justify-center w-full flex-col'
+          style={{
+            color: albumColors[1],
+            borderColor: albumColors[1],
+          }}
+        >
           {song.expand.lyrics.lyrics.map((line, index) => (
             <LyricLine
               line={line.words.map((e) => e.word)}

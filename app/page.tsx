@@ -15,8 +15,6 @@ const durationFormatted = (duration: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
-let volume = 0.5
-
 export default function Home() {
   const [highlightedWord, setHighlightedWord] = useState<{
     lineIndex: number
@@ -28,31 +26,43 @@ export default function Home() {
     '#000000',
   ])
 
-  const [currentTime, setCurrentTime] = useState(0)
+  const [currentTime, setCurrentTime] = useState(35)
+  const [songDuration, setSongDuration] = useState(0)
+  const [currentVolume, setCurrentVolume] = useState(0.5)
 
-  // Seek song handler
-  const seekSong = (event: MouseEvent) => {
-    console.log(event)
-    if (!event.target || !(event.target instanceof HTMLElement)) return
+  const seekSong = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!event.target || !(event.target instanceof HTMLElement))
+      throw new Error('Invalid target element')
+
     const rect = event.target.getBoundingClientRect()
     const x = event.clientX - rect.left
     const width = rect.right - rect.left
     const time = (x / width) * song.duration
-    console.log('Seeking to:', time)
+
     setCurrentTime(time)
 
-    // Try to find current word
-    for (let i = 0; i < song.expand.lyrics.lyrics.length; i++) {
-      const line = song.expand.lyrics.lyrics[i]
-      for (let j = 0; j < line.words.length; j++) {
-        const word = line.words[j]
-        if (word.start > time) {
-          console.log('Found word:', word.word)
-          setHighlightedWord({ lineIndex: i, wordIndex: j })
-          return
-        }
-      }
+    const lineIndex = song.expand.lyrics.lyrics.findIndex((line) => {
+      return line.words.find((word) => word.start > time)
+    })
+
+    if (lineIndex !== -1) {
+      const wordIndex = song.expand.lyrics.lyrics[lineIndex].words.findIndex(
+        (word) => word.start > time
+      )
+      setHighlightedWord({ lineIndex, wordIndex })
     }
+  }
+
+  const updateVolume = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    if (!event.target || !(event.target instanceof HTMLElement))
+      throw new Error('Invalid target element')
+
+    const rect = event.target.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const width = rect.right - rect.left
+    setCurrentVolume(x / width)
   }
 
   // Color Management
@@ -64,6 +74,17 @@ export default function Home() {
       console.log('Album colors:', data)
     }
   }, [data])
+
+  useEffect(() => {
+    // Find highlighted word node
+    const highlightedWordNode = document.querySelector('.highlighted-word')
+    // Scroll into view
+    highlightedWordNode?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center',
+    })
+  }, [highlightedWord])
 
   // Word click handler
   const wordOnClick = (word: { lineIndex: number; wordIndex: number }) => {
@@ -193,7 +214,7 @@ export default function Home() {
                 </span>
                 <div
                   className='w-full bg-gray-200 rounded-full h-1.5 cursor-pointer'
-                  onClick={(e) => seekSong(e)}
+                  onClick={seekSong}
                 >
                   <div
                     className='bg-blue-600 h-1.5 rounded-full transition-all'
@@ -232,10 +253,13 @@ export default function Home() {
               Adjust volume
               <div className='tooltip-arrow' data-popper-arrow></div>
             </div>
-            <div className='mx-auto w-16 bg-gray-200 rounded-full h-1.5'>
+            <div
+              className='mx-auto w-16 bg-gray-200 rounded-full h-1.5 cursor-pointer'
+              onClick={updateVolume}
+            >
               <div
                 className='bg-blue-600 h-1.5 rounded-full transition-all'
-                style={{ width: volume * 100 + '%' }}
+                style={{ width: currentVolume * 100 + '%' }}
               ></div>
             </div>
           </div>

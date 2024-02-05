@@ -15,8 +15,8 @@ const LyricWord: React.FC<LyricWordProps> = ({
     <span
       onClick={onClick}
       className={
-        'mr-1 cursor-pointer transition-all' +
-        (isHighlighted ? ' border-b-4 highlighted-word' : 'border-b-0')
+        'mr-1 cursor-pointer' +
+        (isHighlighted ? ' border-b-4 highlighted-word' : ' border-b-0')
       }
     >
       {word}

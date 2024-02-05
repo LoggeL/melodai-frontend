@@ -16,14 +16,14 @@ const LyricLine: React.FC<LyricLineProps> = ({
 }) => {
   return (
     <div
-      className='my-4 text-md md:text-2xl transition-all break-words w-max-full'
+      className='my-4 text-md md:text-2xl break-words w-max-full'
       style={{
         opacity: highlightedWord
           ? Math.max(
               0.1,
               1 - Math.abs(lineIndex - highlightedWord?.lineIndex) * 0.1
             )
-          : 0,
+          : 0.1,
       }}
     >
       {line.map((word, wordIndex) => (

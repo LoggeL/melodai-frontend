@@ -182,6 +182,11 @@ export default function Home() {
 
     // Seek to timing
     setCurrentTime(wordTiming)
+
+    if (instrumentalAudioRef.current && vocalAudioRef.current) {
+      instrumentalAudioRef.current.currentTime = wordTiming
+      vocalAudioRef.current.currentTime = wordTiming
+    }
   }
 
   return (

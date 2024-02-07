@@ -44,13 +44,13 @@ export default function Home() {
     setCurrentTime(time)
 
     const lineIndex = song.expand.lyrics.lyrics.findIndex((line) => {
-      return line.words.find((word) => word.start > time)
+      return line['word-level'].find((word) => word.start > time)
     })
 
     if (lineIndex !== -1) {
-      const wordIndex = song.expand.lyrics.lyrics[lineIndex].words.findIndex(
-        (word) => word.start > time
-      )
+      const wordIndex = song.expand.lyrics.lyrics[lineIndex][
+        'word-level'
+      ].findIndex((word) => word.start > time)
       setHighlightedWord({ lineIndex, wordIndex })
       // } else {
       //   setHighlightedWord(null)
@@ -147,15 +147,16 @@ export default function Home() {
       setCurrentTime(audio.currentTime)
 
       const lineIndex = song.expand.lyrics.lyrics.findIndex((line) => {
-        return line.words.find((word) => word.start > audio.currentTime)
+        return line['word-level'].find((word) => word.start > audio.currentTime)
       })
 
-      const lineStart = song.expand.lyrics.lyrics[lineIndex].words[0].start
+      const lineStart =
+        song.expand.lyrics.lyrics[lineIndex]['word-level'][0].start
 
       if (lineIndex !== -1 && audio.currentTime - lineStart < 1) {
-        const wordIndex = song.expand.lyrics.lyrics[lineIndex].words.findIndex(
-          (word) => word.start > audio.currentTime
-        )
+        const wordIndex = song.expand.lyrics.lyrics[lineIndex][
+          'word-level'
+        ].findIndex((word) => word.start > audio.currentTime)
         setHighlightedWord({ lineIndex, wordIndex })
         // } else {
         //   setHighlightedWord(null)
@@ -430,7 +431,7 @@ export default function Home() {
         >
           {song.expand.lyrics.lyrics.map((line, index) => (
             <LyricLine
-              line={line.words.map((e) => e.word)}
+              line={line['word-level'].map((e) => e.text)}
               lineIndex={index}
               key={index}
               highlightedWord={highlightedWord}

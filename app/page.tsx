@@ -179,7 +179,8 @@ export default function Home() {
 
     // Find timing of word
     const wordTiming =
-      song.expand.lyrics.lyrics[word.lineIndex].words[word.wordIndex].start
+      song.expand.lyrics.lyrics[word.lineIndex]['word-level'][word.wordIndex]
+        .start
 
     // Seek to timing
     setCurrentTime(wordTiming)

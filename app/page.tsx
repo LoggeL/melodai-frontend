@@ -428,7 +428,7 @@ export default function Home() {
         </div>
 
         {/* Top Right Buttons */}
-        <div className='flex align-middle'>
+        <div className='h-24 align-middle absolute right-0 top-20 xl:static flex'>
           <button
             type='button'
             style={{ color: albumColors[0], backgroundColor: albumColors[1] }}

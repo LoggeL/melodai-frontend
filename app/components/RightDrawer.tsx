@@ -13,10 +13,10 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, colors }) => {
     <div
       className={
         (open ? '' : 'translate-x-full') +
-        ' fixed right-0 h-full flex items-center justify-center transition-all'
+        ' fixed right-0 h-full flex items-center justify-center transition-all z-20'
       }
     >
-      <div className='w-full rounded-l-2xl max-w-sm p-4 bg-white border border-gray-200 shadow'>
+      <div className='w-full rounded-l-2xl max-w-sm p-4 bg-white border border-gray-200 shadow xl:mt-0 mt-24'>
         <form className='space-y-12' action='#'>
           <div className='flex items-center space-x-2 '>
             {/* Icon */}

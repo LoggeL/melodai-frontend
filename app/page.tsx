@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import LyricLine from './components/LyricLine'
 import { usePalette } from 'color-thief-react'
+import LyricLine from './components/LyricLine'
+import RightDrawer from './components/RightDrawer'
 
 // Load song.json
 import song from './song.json'
@@ -26,7 +27,8 @@ export default function Home() {
     '#000000',
   ])
 
-  const [currentTime, setCurrentTime] = useState(35)
+  const [rightDrawerOpen, setRightDrawerOpen] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
   const [songDuration, setSongDuration] = useState(song.duration)
   const [currentVocalVolume, setCurrentVocalVolume] = useState(0.5)
   const [currentInstrumentalVolume, setCurrentInstrumentalVolume] =
@@ -199,6 +201,9 @@ export default function Home() {
       {/* Audio */}
       <audio ref={instrumentalAudioRef} src='instrumental.webm'></audio>
       <audio ref={vocalAudioRef} src='vocals.webm'></audio>
+
+      {/* Right Drawer */}
+      <RightDrawer colors={albumColors} open={rightDrawerOpen} />
 
       {/* Markup */}
       <div className='fixed top-0 left-0 z-50 grid h-24 sm:px-0 md:px-8 w-full text-center'>

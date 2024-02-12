@@ -52,6 +52,11 @@ export default function Home() {
 
     setCurrentTime(time)
 
+    if (instrumentalAudioRef?.current?.currentTime)
+      instrumentalAudioRef.current.currentTime = time
+    if (vocalAudioRef?.current?.currentTime)
+      vocalAudioRef.current.currentTime = time
+
     const lineIndex = song.expand.lyrics.lyrics.findIndex((line) => {
       return line['word-level'].find((word) => word.start > time)
     })

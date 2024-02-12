@@ -16,7 +16,7 @@ const LyricLine: React.FC<LyricLineProps> = ({
 }) => {
   return (
     <div
-      className='my-4 text-md md:text-2xl break-words w-max-full'
+      className='my-4 text-md md:text-2xl break-words max-w-max'
       style={{
         opacity: highlightedWord
           ? Math.max(

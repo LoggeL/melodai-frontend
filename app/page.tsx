@@ -38,7 +38,14 @@ export default function Home() {
     if (!event.target || !(event.target instanceof HTMLElement))
       throw new Error('Invalid target element')
 
-    const rect = event.target.getBoundingClientRect()
+    // If we click on the progress bar we want to pick the parent element
+    const target = event.target.classList.contains('w-full')
+      ? event.target
+      : event.target.parentElement
+
+    if (!target) throw new Error('Invalid target element')
+
+    const rect = target.getBoundingClientRect()
     const x = event.clientX - rect.left
     const width = rect.right - rect.left
     const time = (x / width) * song.duration
@@ -65,7 +72,14 @@ export default function Home() {
     if (!event.target || !(event.target instanceof HTMLElement))
       throw new Error('Invalid target element')
 
-    const rect = event.target.getBoundingClientRect()
+    // If we click on the progress bar we want to pick the parent element
+    const target = event.target.classList.contains('w-full')
+      ? event.target
+      : event.target.parentElement
+
+    if (!target) throw new Error('Invalid target element')
+
+    const rect = target.getBoundingClientRect()
     const x = event.clientX - rect.left
     const width = rect.right - rect.left
     setCurrentVocalVolume(x / width)
@@ -77,7 +91,14 @@ export default function Home() {
     if (!event.target || !(event.target instanceof HTMLElement))
       throw new Error('Invalid target element')
 
-    const rect = event.target.getBoundingClientRect()
+    // If we click on the progress bar we want to pick the parent element
+    const target = event.target.classList.contains('w-full')
+      ? event.target
+      : event.target.parentElement
+
+    if (!target) throw new Error('Invalid target element')
+
+    const rect = target.getBoundingClientRect()
     const x = event.clientX - rect.left
     const width = rect.right - rect.left
     setCurrentInstrumentalVolume(x / width)
@@ -262,11 +283,13 @@ export default function Home() {
                   <button
                     data-tooltip-target='tooltip-pause'
                     type='button'
-                    className='inline-flex items-center justify-center p-2.5 mx-2 font-medium bg-blue-600 rounded-full hover:bg-blue-700 group focus:ring-4 focus:ring-blue-300 focus:outline-none'
+                    style={{ backgroundColor: albumColors[1] }}
+                    className='inline-flex items-center justify-center p-2.5 mx-2 font-medium rounded-full group focus:ring-4 focus:ring-blue-300 focus:outline-none'
                     onClick={() => setPlaying(!playing)}
                   >
                     {playing ? (
                       <svg
+                        style={{ color: albumColors[0] }}
                         className='w-3 h-3 text-white'
                         aria-hidden='true'
                         xmlns='http://www.w3.org/2000/svg'
@@ -281,7 +304,8 @@ export default function Home() {
                       </svg>
                     ) : (
                       <svg
-                        className='w-3 h-3 text-white'
+                        className='w-3 h-3'
+                        style={{ color: albumColors[0] }}
                         aria-hidden='true'
                         xmlns='http://www.w3.org/2000/svg'
                         fill='currentColor'
@@ -335,8 +359,11 @@ export default function Home() {
                   onClick={seekSong}
                 >
                   <div
-                    className='bg-blue-600 h-1.5 rounded-full transition-all'
-                    style={{ width: (currentTime / song.duration) * 100 + '%' }}
+                    className='h-1.5 rounded-full transition-all'
+                    style={{
+                      width: (currentTime / song.duration) * 100 + '%',
+                      backgroundColor: albumColors[1],
+                    }}
                   ></div>
                 </div>
                 <span className='text-sm font-medium text-gray-900'>
@@ -385,8 +412,11 @@ export default function Home() {
                 onClick={updateVocalVolume}
               >
                 <div
-                  className='bg-blue-600 h-1.5 rounded-full transition-all'
-                  style={{ width: currentVocalVolume * 100 + '%' }}
+                  className='h-1.5 rounded-full transition-all'
+                  style={{
+                    width: currentVocalVolume * 100 + '%',
+                    backgroundColor: albumColors[1],
+                  }}
                 ></div>
               </div>
             </div>
@@ -419,8 +449,11 @@ export default function Home() {
                 onClick={updateInstrumentalVolume}
               >
                 <div
-                  className='bg-blue-600 h-1.5 rounded-full transition-all'
-                  style={{ width: currentInstrumentalVolume * 100 + '%' }}
+                  className='h-1.5 rounded-full transition-all'
+                  style={{
+                    width: currentInstrumentalVolume * 100 + '%',
+                    backgroundColor: albumColors[1],
+                  }}
                 ></div>
               </div>
             </div>

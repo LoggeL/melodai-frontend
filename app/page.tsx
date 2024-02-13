@@ -7,7 +7,7 @@ import RightDrawer from './components/RightDrawer'
 
 // Load song.json
 import song from './song.json'
-import { use, useEffect, useRef, useState } from 'react'
+import { SetStateAction, useEffect, useRef, useState } from 'react'
 
 const durationFormatted = (duration: number) => {
   duration = Math.round(duration)
@@ -28,6 +28,7 @@ export default function Home() {
   ])
 
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false)
+  const [rightDrawerMode, setRightDrawerMode] = useState('settings')
   const [currentTime, setCurrentTime] = useState(0)
   const [songDuration, setSongDuration] = useState(song.duration)
   const [currentVocalVolume, setCurrentVocalVolume] = useState(0.5)
@@ -69,6 +70,11 @@ export default function Home() {
       // } else {
       //   setHighlightedWord(null)
     }
+  }
+
+  const toggleRightDrawer = (mode: string) => {
+    if (!rightDrawerOpen) setRightDrawerMode(mode)
+    setRightDrawerOpen(!rightDrawerOpen)
   }
 
   const updateVocalVolume = (
@@ -229,7 +235,11 @@ export default function Home() {
       <audio ref={vocalAudioRef} src='vocals.webm'></audio>
 
       {/* Right Drawer */}
-      <RightDrawer colors={albumColors} open={rightDrawerOpen} />
+      <RightDrawer
+        colors={albumColors}
+        open={rightDrawerOpen}
+        mode={rightDrawerMode}
+      />
 
       {/* Markup */}
       <div className='fixed top-0 left-0 z-50 h-24 sm:px-0 md:px-8 w-full text-center flex'>
@@ -471,7 +481,7 @@ export default function Home() {
             type='button'
             style={{ color: albumColors[0], backgroundColor: albumColors[1] }}
             className='text-white font-medium rounded-full text-sm h-12 w-12 mt-6 text-center inline-flex items-center mx-2'
-            onClick={() => setRightDrawerOpen(!rightDrawerOpen)}
+            onClick={() => toggleRightDrawer('search')}
           >
             <svg
               className='w-12 h-12 min-w-12 p-2 rounded-lg cursor-pointer'
@@ -488,14 +498,14 @@ export default function Home() {
                 d='m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z'
               />
             </svg>
-            <span className='sr-only'>Icon description</span>
+            <span className='sr-only'>Search Button</span>
           </button>
 
           <button
             type='button'
             style={{ color: albumColors[0], backgroundColor: albumColors[1] }}
             className='text-white font-medium rounded-full text-sm h-12 w-12 mt-6 text-center inline-flex items-center mx-2'
-            onClick={() => setRightDrawerOpen(!rightDrawerOpen)}
+            onClick={() => toggleRightDrawer('settings')}
           >
             <svg
               viewBox='-4 -4 32 32'
@@ -515,7 +525,7 @@ export default function Home() {
                 strokeWidth='1.5'
               />
             </svg>
-            <span className='sr-only'>Icon description</span>
+            <span className='sr-only'>Settings Button</span>
           </button>
         </div>
       </div>

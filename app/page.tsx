@@ -34,6 +34,7 @@ export default function Home() {
   const [currentVocalVolume, setCurrentVocalVolume] = useState(0.5)
   const [currentInstrumentalVolume, setCurrentInstrumentalVolume] =
     useState(0.5)
+  const [expandPlaylist, setExpandPlaylist] = useState(false)
 
   const seekSong = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!event.target || !(event.target instanceof HTMLElement))
@@ -75,6 +76,10 @@ export default function Home() {
   const toggleRightDrawer = (mode: string) => {
     if (!rightDrawerOpen) setRightDrawerMode(mode)
     setRightDrawerOpen(!rightDrawerOpen)
+  }
+
+  const expandPlaylistHandler = () => {
+    setExpandPlaylist(!expandPlaylist)
   }
 
   const updateVocalVolume = (
@@ -122,6 +127,10 @@ export default function Home() {
     if (data && data.length > 0) {
       setAlbumColors(data)
       console.log('Album colors:', data)
+
+      // Set css variables
+      document.documentElement.style.setProperty('--primary-color', data[1])
+      document.documentElement.style.setProperty('--secondary-color', data[0])
     }
   }, [data])
 
@@ -230,6 +239,27 @@ export default function Home() {
       className='transition-all flex min-h-screen flex-col items-center justify-between sm:px-0'
       style={{ backgroundColor: albumColors[0] }}
     >
+      {/* Style */}
+      <style jsx global>{`
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+          background-color: var(--primary-color);
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-track {
+          background-color: var(--secondary-color);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background-color: var(--primary-color);
+        }
+        ::-webkit-scrollbar-thumb:active {
+          background-color: var(--primary-color);
+        }
+      `}</style>
+
       {/* Audio */}
       <audio ref={instrumentalAudioRef} src='instrumental.webm'></audio>
       <audio ref={vocalAudioRef} src='vocals.webm'></audio>

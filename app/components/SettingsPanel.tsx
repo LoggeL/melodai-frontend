@@ -66,8 +66,8 @@ const SettingsPanel: React.FC<SettingPanelProps> = ({ colors }) => {
                 >
                   <path
                     stroke='currentColor'
-                    stroke-linejoin='round'
-                    stroke-width='2'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
                     d='M10 3v4c0 .6-.4 1-1 1H5m14-4v16c0 .6-.4 1-1 1H6a1 1 0 0 1-1-1V8c0-.4.1-.6.3-.8l4-4 .6-.2H18c.6 0 1 .4 1 1Z'
                   />
                 </svg>
@@ -99,9 +99,9 @@ const SettingsPanel: React.FC<SettingPanelProps> = ({ colors }) => {
                 >
                   <path
                     stroke='currentColor'
-                    stroke-linecap='round'
-                    stroke-linejoin='round'
-                    stroke-width='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
                     d='M17 15.5V5s3 1 3 4m-7-3H4m9 4H4m4 4H4m13 2.4c0 1.3-1.3 2.4-3 2.4s-3-1-3-2.4c0-1.3 1.3-2.4 3-2.4s3 1 3 2.4Z'
                   />
                 </svg>

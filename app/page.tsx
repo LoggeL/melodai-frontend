@@ -29,6 +29,7 @@ export default function Home() {
     '#000000',
   ])
 
+  const [expandPlaylist, setExpandPlaylist] = useState(false)
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false)
   const [rightDrawerMode, setRightDrawerMode] = useState('settings')
   const [currentTime, setCurrentTime] = useState(0)
@@ -36,7 +37,6 @@ export default function Home() {
   const [currentVocalVolume, setCurrentVocalVolume] = useState(0.5)
   const [currentInstrumentalVolume, setCurrentInstrumentalVolume] =
     useState(0.5)
-  const [expandPlaylist, setExpandPlaylist] = useState(false)
 
   const seekSong = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!event.target || !(event.target instanceof HTMLElement))
@@ -277,7 +277,12 @@ export default function Home() {
       <div className='fixed top-0 left-0 z-50 h-24 sm:px-0 md:px-8 w-full text-center flex'>
         <div className='flex w-32'></div>
         <div className='flex flex-col items-center justify-between mx-auto rounded-b-lg'>
-          <div className='flex bg-gray-50 w-full'>
+          <div
+            className={
+              'flex bg-gray-100 w-full border-gray-100 border-2 transition-all' +
+              (expandPlaylist ? ' h-96' : ' max-h-0')
+            }
+          >
             <SongQueue song={song} colors={albumColors}></SongQueue>
           </div>
 
@@ -295,11 +300,38 @@ export default function Home() {
               currentInstrumentalVolume={currentInstrumentalVolume}
               setCurrentInstrumentalVolume={setCurrentInstrumentalVolume}
               durationFormatted={durationFormatted}
-              expandPlaylistHandler={expandPlaylistHandler}
-              expandPlaylist={expandPlaylist}
               song={song}
               colors={albumColors}
             ></CurrentSongPlayer>
+            {/* Open & Close button */}
+            <div className='w-full flex items-center justify-center absolute left-0 mt-20 z-0'>
+              <button
+                type='button'
+                className='rounded-b-full bg-white'
+                onClick={() => expandPlaylistHandler()}
+              >
+                {/* Arrow down */}
+                <svg
+                  className='w-16 h-8 pt-2 p-1 pb-1 cursor-pointer transition-transform'
+                  aria-hidden='true'
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 12'
+                  stroke='currentColor'
+                  style={{
+                    transform: `rotate(${expandPlaylist ? 180 : 0}deg)`,
+                  }}
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M6 2 L 12 8 L 18 2'
+                  />
+                </svg>
+                <span className='sr-only'>Expand Queue Button</span>
+              </button>
+            </div>
           </div>
         </div>
         {/* Top Right Buttons */}

@@ -19,8 +19,6 @@ interface CurrentSongPlayerProps {
   currentInstrumentalVolume: number
   setCurrentInstrumentalVolume: React.Dispatch<React.SetStateAction<number>>
   durationFormatted: (time: number) => string
-  expandPlaylistHandler: () => void
-  expandPlaylist: boolean
   song: any
 }
 

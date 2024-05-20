@@ -92,7 +92,7 @@ export default function Home() {
       throw new Error('Invalid target element')
 
     // If we click on the progress bar we want to pick the parent element
-    const target = event.target.classList.contains('w-full')
+    const target = event.target.classList.contains('flex')
       ? event.target
       : event.target.parentElement
 
@@ -111,7 +111,7 @@ export default function Home() {
       throw new Error('Invalid target element')
 
     // If we click on the progress bar we want to pick the parent element
-    const target = event.target.classList.contains('w-full')
+    const target = event.target.classList.contains('flex')
       ? event.target
       : event.target.parentElement
 
@@ -120,6 +120,7 @@ export default function Home() {
     const rect = target.getBoundingClientRect()
     const x = event.clientX - rect.left
     const width = rect.right - rect.left
+    console.log(x / width)
     setCurrentInstrumentalVolume(x / width)
   }
 

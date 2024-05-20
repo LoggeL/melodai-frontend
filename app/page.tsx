@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { usePalette } from 'color-thief-react'
 import LyricLine from './components/LyricLine'
 import RightDrawer from './components/RightDrawer'
@@ -22,6 +21,7 @@ export default function Home() {
   const [highlightedWord, setHighlightedWord] = useState<{
     lineIndex: number
     wordIndex: number
+    active?: boolean
   } | null>({ lineIndex: 10, wordIndex: 3 })
 
   const [albumColors, setAlbumColors] = useState<string[]>([
@@ -61,15 +61,16 @@ export default function Home() {
     if (vocalAudioRef?.current?.currentTime)
       vocalAudioRef.current.currentTime = time
 
-    const lineIndex = song.expand.lyrics.lyrics.findIndex((line) => {
-      return line['word-level'].find((word) => word.start > time)
+    const lineIndex = song.lyrics.findIndex((line) => {
+      return line.words.find((word) => word.start > time)
     })
 
     if (lineIndex !== -1) {
-      const wordIndex = song.expand.lyrics.lyrics[lineIndex][
-        'word-level'
-      ].findIndex((word) => word.start > time)
-      setHighlightedWord({ lineIndex, wordIndex })
+      const wordIndex = song.lyrics[lineIndex].words.findIndex(
+        (word) => word.start > time
+      )
+
+      setHighlightedWord({ lineIndex, wordIndex, active: true })
       // } else {
       //   setHighlightedWord(null)
     }
@@ -191,20 +192,26 @@ export default function Home() {
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime)
 
-      const lineIndex = song.expand.lyrics.lyrics.findIndex((line) => {
-        return line['word-level'].find((word) => word.start > audio.currentTime)
+      const lineIndex = song.lyrics.findIndex((line) => {
+        return line.words.find((word) => word.end > audio.currentTime)
       })
 
-      const lineStart =
-        song.expand.lyrics.lyrics[lineIndex]['word-level'][0].start
+      if (lineIndex !== -1) {
+        const wordIndex = song.lyrics[lineIndex].words.findIndex(
+          (word) => word.end > audio.currentTime
+        )
+        // Is the current word active?
+        const active =
+          song.lyrics[lineIndex].words[wordIndex].start < audio.currentTime
 
-      if (lineIndex !== -1 && audio.currentTime - lineStart < 1) {
-        const wordIndex = song.expand.lyrics.lyrics[lineIndex][
-          'word-level'
-        ].findIndex((word) => word.start > audio.currentTime)
-        setHighlightedWord({ lineIndex, wordIndex })
-        // } else {
-        //   setHighlightedWord(null)
+        setHighlightedWord({ lineIndex, wordIndex, active })
+      } else {
+        // Last word
+        setHighlightedWord({
+          lineIndex: song.lyrics.length - 1,
+          wordIndex: song.lyrics[song.lyrics.length - 1].words.length - 1,
+          active: false,
+        })
       }
     }
 
@@ -220,12 +227,14 @@ export default function Home() {
   const wordOnClick = (word: { lineIndex: number; wordIndex: number }) => {
     console.log('Clicked on word:', word)
 
-    setHighlightedWord(word)
+    setHighlightedWord({
+      lineIndex: word.lineIndex,
+      wordIndex: word.wordIndex,
+      active: true,
+    })
 
     // Find timing of word
-    const wordTiming =
-      song.expand.lyrics.lyrics[word.lineIndex]['word-level'][word.wordIndex]
-        .start
+    const wordTiming = song.lyrics[word.lineIndex].words[word.wordIndex].start
 
     // Seek to timing
     setCurrentTime(wordTiming)
@@ -263,7 +272,7 @@ export default function Home() {
       `}</style>
 
       {/* Audio */}
-      <audio ref={instrumentalAudioRef} src='instrumental.webm'></audio>
+      <audio ref={instrumentalAudioRef} src='no_vocals.webm'></audio>
       <audio ref={vocalAudioRef} src='vocals.webm'></audio>
 
       {/* Right Drawer */}
@@ -280,7 +289,7 @@ export default function Home() {
           <div
             className={
               'flex bg-gray-100 w-full border-gray-100 border-2 transition-all' +
-              (expandPlaylist ? ' h-96' : ' max-h-0')
+              (expandPlaylist ? ' max-h-96 h-96' : ' max-h-0')
             }
           >
             <SongQueue song={song} colors={albumColors}></SongQueue>
@@ -397,9 +406,9 @@ export default function Home() {
             borderColor: albumColors[1],
           }}
         >
-          {song.expand.lyrics.lyrics.map((line, index) => (
+          {song.lyrics.map((line, index) => (
             <LyricLine
-              line={line['word-level'].map((e) => e.text)}
+              line={line.words.map((e) => e.word)}
               lineIndex={index}
               key={index}
               highlightedWord={highlightedWord}

@@ -40,16 +40,16 @@ const CurrentSongPlayer: React.FC<CurrentSongPlayerProps> = ({
 }) => {
   return (
     <>
-      <div className='flex items-center justify-start me-auto mx-8 w-44'>
+      <div className='flex items-center justify-start me-auto mx-8 w-44 z-2'>
         <Image
-          className='rounded mx-3 hidden md:block'
+          className='rounded mx-3 hidden md:block w-20'
           src='/thumbnail.jpg'
           alt='song preview'
-          width={64}
-          height={64}
+          width={128}
+          height={192}
         />
         <span className='text-sm text-gray-900 mx-auto '>
-          KUMMER <br /> Rest meines Lebens
+          {song.track_artist} <br /> {song.track_name}
         </span>
       </div>
 

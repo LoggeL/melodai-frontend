@@ -4,7 +4,11 @@ import LyricWord from './LyricWord'
 interface LyricLineProps {
   line: string[]
   lineIndex: number
-  highlightedWord: { lineIndex: number; wordIndex: number } | null
+  highlightedWord: {
+    lineIndex: number
+    wordIndex: number
+    active?: boolean
+  } | null
   onWordClick: (word: { lineIndex: number; wordIndex: number }) => void
 }
 
@@ -34,6 +38,7 @@ const LyricLine: React.FC<LyricLineProps> = ({
             highlightedWord?.lineIndex === lineIndex &&
             highlightedWord?.wordIndex === wordIndex
           }
+          isActive={highlightedWord?.active}
           onClick={() => onWordClick({ lineIndex, wordIndex })}
         />
       ))}

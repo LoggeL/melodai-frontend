@@ -29,6 +29,8 @@ export default function Home() {
     '#000000',
   ])
 
+  const [docHeight, setDocHeight] = useState(0)
+  const [verticalProgress, setVerticalProgress] = useState(0)
   const [expandPlaylist, setExpandPlaylist] = useState(false)
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false)
   const [rightDrawerMode, setRightDrawerMode] = useState('settings')
@@ -43,17 +45,25 @@ export default function Home() {
       throw new Error('Invalid target element')
 
     // If we click on the progress bar we want to pick the parent element
-    const target = event.target.classList.contains('w-full')
-      ? event.target
-      : event.target.parentElement
+    const target =
+      event.target.classList.contains('horizontal') ||
+      event.target.classList.contains('vertical')
+        ? event.target
+        : event.target.parentElement
 
     if (!target) throw new Error('Invalid target element')
 
+    let time = 0
     const rect = target.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const width = rect.right - rect.left
-    const time = (x / width) * song.duration
-
+    if (target.classList.contains('vertical')) {
+      const y = event.clientY - rect.top
+      const height = rect.bottom - rect.top
+      time = (y / height) * song.duration
+    } else {
+      const x = event.clientX - rect.left
+      const width = rect.right - rect.left
+      time = (x / width) * song.duration
+    }
     setCurrentTime(time)
 
     if (instrumentalAudioRef?.current?.currentTime)
@@ -185,6 +195,41 @@ export default function Home() {
     }
   }, [playing])
 
+  // Document height
+  useEffect(() => {
+    setDocHeight(document.documentElement.scrollHeight)
+
+    // Get current progress based on time and lyrics
+    const lineIndex = song.lyrics.findIndex((line) => {
+      return line.words.find((word) => word.end > currentTime)
+    })
+
+    // Here comes the insane spaghetti math
+    // -0.25 to 0.25 if the time is between lines
+    // 0.25 to 0.75 if the time is in the line
+    if (lineIndex === -1 && currentTime < song.lyrics[0].start) {
+      const delta = currentTime - song.lyrics[0].start
+      setVerticalProgress((0.25 - 0.25 * delta) / song.lyrics.length)
+    } else if (
+      lineIndex === -1 &&
+      currentTime > song.lyrics[song.lyrics.length - 1].end
+    ) {
+      const delta =
+        (currentTime - song.lyrics[song.lyrics.length - 1].end) /
+        (songDuration - song.lyrics[song.lyrics.length - 1].end)
+      setVerticalProgress(
+        (song.lyrics.length - 0.25 + 0.25 * delta) / song.lyrics.length
+      )
+    } else {
+      const lineProgress =
+        (currentTime - song.lyrics[lineIndex].start) /
+        (song.lyrics[lineIndex].end - song.lyrics[lineIndex].start)
+      setVerticalProgress(
+        (lineIndex + lineProgress * 0.5 + 0.25) / song.lyrics.length
+      )
+    }
+  }, [currentTime, songDuration])
+
   // Timeupdate
   useEffect(() => {
     const audio = instrumentalAudioRef.current
@@ -283,7 +328,7 @@ export default function Home() {
         mode={rightDrawerMode}
       />
 
-      {/* Markup */}
+      {/* Top Elements */}
       <div className='fixed top-0 left-0 z-50 h-24 sm:px-0 md:px-8 w-full text-center flex'>
         <div className='flex w-32'></div>
         <div className='flex flex-col items-center justify-between mx-auto rounded-b-lg'>
@@ -399,7 +444,25 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Main elements */}
       <section style={{ margin: '50vh 0' }}>
+        {/* Vertical Progress bar */}
+        <div
+          className='absolute z-50 w-2 cursor-pointer vertical'
+          onClick={seekSong}
+          style={{ height: `calc(${docHeight}px - 100vh)` }}
+        >
+          <div
+            className='w-full transition-all'
+            style={{
+              height: `${verticalProgress * 100}%`,
+              backgroundColor: albumColors[1],
+              boxShadow: `0 0 5px 2px ${albumColors[1]}`,
+              borderRadius: '10px',
+            }}
+          ></div>
+        </div>
+
         <div
           className='flex items-center justify-center w-full flex-col'
           style={{
